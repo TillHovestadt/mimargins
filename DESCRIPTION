@@ -9,8 +9,5 @@ Description: Make it easy to calculate AMEs for data with Multiple Imputation.
     Applies Rubin's Rules to pool AMEs and SEs.
 License: MIT License
 Encoding: UTF-8
-Imports:
-    margins (>= 0.3.26)
-    lme4 (>= 1.1.34)
 LazyData: true
 RoxygenNote: 7.2.3
