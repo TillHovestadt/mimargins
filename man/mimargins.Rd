@@ -2,7 +2,7 @@
 % Please edit documentation in R/mimargins.R
 \name{mimargins}
 \alias{mimargins}
-\title{Calculation of Average Marginal Effects for Multiple Imputed Data in R}
+\title{AME Calculation}
 \usage{
 mimargins(
   df,
@@ -32,6 +32,9 @@ mimargins(
 
 \item{linkfunction}{If type is set to 'glm', a linkfunction needs to be specified. Has no effect if type is set to other values.}
 }
+\value{
+Returns Datafram of AMEs and SEs.
+}
 \description{
-Calculation of Average Marginal Effects for Multiple Imputed Data in R
+AME Calculation
 }
