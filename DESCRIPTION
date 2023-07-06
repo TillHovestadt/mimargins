@@ -1,0 +1,16 @@
+Package: mimargins
+Type: Package
+Title: Calculation of Average Marginal Effects for Multiple Imputed Data
+Version: 0.1.0
+Author: 
+    person("Till", "Hovestadt", email = "till.hovestadt@uni-leipzig.de", role = c("cre", "aut"))
+Maintainer: Till Hovestadt <till.hovestadt@uni-leipzig.de>
+Description: Make it easy to calculate AMEs for data with Multiple Imputation. 
+    Applies Rubin's Rules to pool AMEs and SEs.
+License: MIT License
+Encoding: UTF-8
+Imports:
+    margins
+    lme4
+LazyData: true
+RoxygenNote: 7.2.3
