@@ -276,7 +276,8 @@ mimargins <- function(df,
                         "_=_",
                         a[[names(x = at)]]),
           AME = NA,
-          SE = NA
+          SE = NA,
+          at_level = a[[names(x = at)]]
         )
 
         for (eff in pred$name) {
@@ -671,7 +672,8 @@ mimargins <- function(df,
                         "_=_",
                         a[[names(x = at)]]),
           AME = NA,
-          SE = NA
+          SE = NA,
+          at_level = a[[names(x = at)]]
         )
 
         for (eff in pred$name) {
@@ -1068,7 +1070,8 @@ mimargins <- function(df,
                         "_=_",
                         a[[names(x = at)]]),
           AME = NA,
-          SE = NA
+          SE = NA,
+          at_level = a[[names(x = at)]]
         )
 
         for (eff in pred$name) {
