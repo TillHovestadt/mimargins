@@ -8,7 +8,7 @@
 #' @param at Whether AMEs shall be calculated at specified levels of another variable. Currently only works for specifying one variable. The number of levels may vary. Input has to take the form list(VARIABLENAME = c(level1, level2, level3 ...)). Only has an effect if ame = T. Defaults to NULL. Then, AMEs are averaged over all levels of all other variables.
 #' @param linkfunction If type is set to 'glm', a linkfunction needs to be specified. Has no effect if type is set to other values.
 #' @param type Specifies which type of regression to run. Currently supports 'lm' (Default), 'lmer' and 'glm'. Has to correspond to the specified formula.
-#' @return Returns Datafram of AMEs and SEs.
+#' @return Returns Dataframe of AMEs and SEs.
 #' @export
 mimargins <- function(df,
                       formula,

@@ -23,12 +23,12 @@ mipredictions(
 
 \item{type}{Specifies which type of regression to run. Currently supports 'lm' (Default), 'lmer' and 'glm'. Has to correspond to the specified formula.}
 
-\item{at}{Whether AMEs shall be calculated at specified levels of another variable. Currently only works for specifying one variable. The number of levels may vary. Input has to take the form list(VARIABLENAME = c(level1, level2, level3 ...)). Defaults to NULL. Then, Predicted Values are averaged over all levels of all other variables.}
+\item{at}{Whether Predicted Values shall be calculated at specified levels of another variable. Currently only works for specifying one variable. The number of levels may vary. Input has to take the form list(VARIABLENAME = c(level1, level2, level3 ...)). Defaults to NULL. Then, Predicted Values are averaged over all levels of all other variables.}
 
 \item{linkfunction}{If type is set to 'glm', a linkfunction needs to be specified. Has no effect if type is set to other values.}
 }
 \value{
-Returns Datafram of Predicted Values and SEs.
+Returns Dataframe of Predicted Values and SEs.
 }
 \description{
 Predicted Values Calculation

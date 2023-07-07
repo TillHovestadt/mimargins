@@ -3,10 +3,10 @@
 #' @param df The data frame which should be used for the regressions. Should be in long format and preferably not a mids-object. Whether mids-objects work has not yet been tested, however.
 #' @param formula The Regression formula. Should preferably be a formula object. Must correspond to regression type specified in 'type'.
 #' @param imp_var The variable in the data frame indicating the imputation (m). Defaults to ".imp".
-#' @param at Whether AMEs shall be calculated at specified levels of another variable. Currently only works for specifying one variable. The number of levels may vary. Input has to take the form list(VARIABLENAME = c(level1, level2, level3 ...)). Defaults to NULL. Then, Predicted Values are averaged over all levels of all other variables.
+#' @param at Whether Predicted Values shall be calculated at specified levels of another variable. Currently only works for specifying one variable. The number of levels may vary. Input has to take the form list(VARIABLENAME = c(level1, level2, level3 ...)). Defaults to NULL. Then, Predicted Values are averaged over all levels of all other variables.
 #' @param linkfunction If type is set to 'glm', a linkfunction needs to be specified. Has no effect if type is set to other values.
 #' @param type Specifies which type of regression to run. Currently supports 'lm' (Default), 'lmer' and 'glm'. Has to correspond to the specified formula.
-#' @return Returns Datafram of Predicted Values and SEs.
+#' @return Returns Dataframe of Predicted Values and SEs.
 #' @export
 mipredictions <- function(df,
                           formula,
