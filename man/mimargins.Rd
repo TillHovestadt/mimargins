@@ -33,7 +33,7 @@ mimargins(
 \item{linkfunction}{If type is set to 'glm', a linkfunction needs to be specified. Has no effect if type is set to other values.}
 }
 \value{
-Returns Datafram of AMEs and SEs.
+Returns Dataframe of AMEs and SEs.
 }
 \description{
 AME Calculation

@@ -21,6 +21,8 @@ mipredictions(
 
 \item{imp_var}{The variable in the data frame indicating the imputation (m). Defaults to ".imp".}
 
+\item{id_var}{The variable in the data frame differentiating the groups.}
+
 \item{type}{Specifies which type of regression to run. Currently supports 'lm' (Default), 'lmer' and 'glm'. Has to correspond to the specified formula.}
 
 \item{at}{Whether Predicted Values shall be calculated at specified levels of another variable. Currently only works for specifying one variable. The number of levels may vary. Input has to take the form list(VARIABLENAME = c(level1, level2, level3 ...)). Defaults to NULL. Then, Predicted Values are averaged over all levels of all other variables.}
