@@ -7,6 +7,7 @@
 #' @param at Whether Predicted Values shall be calculated at specified levels of another variable. Currently only works for specifying one variable. The number of levels may vary. Input has to take the form list(VARIABLENAME = c(level1, level2, level3 ...)). Defaults to NULL. Then, Predicted Values are averaged over all levels of all other variables.
 #' @param linkfunction If type is set to 'glm', a linkfunction needs to be specified. Has no effect if type is set to other values.
 #' @param type Specifies which type of regression to run. Currently supports 'lm' (Default), 'lmer' and 'glm'. Has to correspond to the specified formula.
+#' @param variables Specifies the variables of interest for which pooled estimates shall be computed. Only applies for type == "lmer". In all other cases, all variables in the regression model are taken as a default.
 #' @return Returns Dataframe of Predicted Values and SEs.
 #' @export
 mipredictions <- function(df,
@@ -15,7 +16,8 @@ mipredictions <- function(df,
                           id_var,
                           type = "lm",
                           at = NULL,
-                          linkfunction = NULL) {
+                          linkfunction = NULL,
+                          variables) {
   # for linear OLS regression ----
   if (type == "lm") {
     if (is.null(at)) {
@@ -557,6 +559,8 @@ mipredictions <- function(df,
       test  <- lmer(formula = formula,
                     data = df[df[[imp_var]] == 1, ])
 
+      b <- summary(test)
+
       a <- prediction::prediction(model = test,
                                   at = at)
 
@@ -564,7 +568,7 @@ mipredictions <- function(df,
       imps <- length(unique(df[[imp_var]]))
       ids <- unique(df[[paste0(id_var)]])
 
-      for (col in colnames(test$model)) {
+      for (col in variables) {
         assign(x = paste0(col),
                value = data.frame(matrix(
                  data = rep(x = NA, times = imps * length(a$fitted)),
@@ -591,8 +595,8 @@ mipredictions <- function(df,
           ncol = length(a$se.fitted)
         ))
 
-      colnames(pred_coef) <- a[[paste0(id_var)]]
-      colnames(pred_se) <- a[[paste0(id_var)]]
+      colnames(pred_coef) <- ids
+      colnames(pred_se) <- ids
 
       pred_coef$imputation <- c(1:imps)
       pred_se$imputation <- c(1:imps)
@@ -604,16 +608,27 @@ mipredictions <- function(df,
         regpred <- prediction::prediction(model = reg,
                                           at = at)
 
-        regmodel <- reg$model
-        regmodel$idvariable <- regpred[[paste0(id_var)]]
+        regmodel <- data.frame(matrix(data = NA,
+                                      nrow = length(a$fitted),
+                                      ncol = length(variables)))
+        colnames(regmodel) <- variables
+        regmodel$idvariable <- df[df[[imp_var]] == imp, ][[paste0(id_var)]]
+        regmodel$pred <- regpred$fitted
+        regmodel$pred_se <- regpred$se.fitted
+
+        for (var in variables) {
+
+          regmodel[[paste0(var)]] <- regpred[[paste0(var)]]
+
+        }
 
         for (id in ids) {
           pred_coef[[paste0(id)]][pred_coef$imputation == imp] <-
-            regpred$fitted[regpred[[paste0(id_var)]] == id]
+            regmodel$pred[regmodel$idvariable == id]
           pred_se[[paste0(id)]][pred_se$imputation == imp] <-
-            regpred$se.fitted[regpred[[paste0(id_var)]] == id]
+            regmodel$pred_se[regmodel$idvariable == id]
 
-          for (col in colnames(reg$model)) {
+          for (col in variables) {
             d <- get(paste0(col))
 
             d[[paste0(id)]][get(paste0(col))[["imputation"]] == imp] <-
@@ -653,12 +668,12 @@ mipredictions <- function(df,
           ncol = length(a$fitted)
         ))
 
-      colnames(mean_pred) <- a[[paste0(id_var)]]
-      colnames(within_var) <- a[[paste0(id_var)]]
-      colnames(between_var) <- a[[paste0(id_var)]]
-      colnames(pooled_se) <- a[[paste0(id_var)]]
+      colnames(mean_pred) <- ids
+      colnames(within_var) <- ids
+      colnames(between_var) <- ids
+      colnames(pooled_se) <- ids
 
-      for (col in colnames(test$model)) {
+      for (col in variables) {
         assign(x = paste0("mean_",
                           col),
                value = data.frame(matrix(
@@ -685,7 +700,7 @@ mipredictions <- function(df,
         pooled_se[[paste0(id)]] <-
           sqrt(within_var[[paste0(id)]] + between_var[[paste0(id)]] + (between_var[[paste0(id)]] / imps))
 
-        for (col in colnames(test$model)) {
+        for (col in variables) {
           d <- get(paste0("mean_",
                           col))
 
@@ -709,7 +724,7 @@ mipredictions <- function(df,
       )
       pred[[paste0(id_var)]] <- ids
 
-      for (col in colnames(test$model)) {
+      for (col in variables) {
         pred[[paste0(col)]] <- NA
 
 
@@ -721,7 +736,7 @@ mipredictions <- function(df,
         pred$pred_se[pred[[paste0(id_var)]] == id] <-
           pooled_se[[paste0(id)]]
 
-        for (col in colnames(test$model)) {
+        for (col in variables) {
           pred[[paste0(col)]][pred[[paste0(id_var)]] == id] <-
             get(paste0("mean_",
                        col))[[paste0(id)]]
@@ -747,6 +762,8 @@ mipredictions <- function(df,
       test  <- lmer(formula = formula,
                     data = df[df[[imp_var]] == 1, ])
 
+      b <- summary(test)
+
       a <- prediction::prediction(model = test,
                                   at = at)
 
@@ -754,7 +771,7 @@ mipredictions <- function(df,
       imps <- length(unique(df[[imp_var]]))
       ids <- unique(df[[paste0(id_var)]])
 
-      for (col in colnames(test$model)) {
+      for (col in variables) {
         assign(x = paste0(col),
                value = data.frame(matrix(
                  data = rep(x = NA, times = imps * length(a$fitted)),
@@ -762,7 +779,7 @@ mipredictions <- function(df,
                )))
 
         d <- get(paste0(col))
-        colnames(d) <- paste0(a[[paste0(id_var)]],
+        colnames(d) <- paste0(ids,
                               "_at_",
                               names(x = at),
                               "_=_",
@@ -785,12 +802,12 @@ mipredictions <- function(df,
           ncol = length(a$se.fitted)
         ))
 
-      colnames(pred_coef) <- paste0(a[[paste0(id_var)]],
+      colnames(pred_coef) <- paste0(ids,
                                     "_at_",
                                     names(x = at),
                                     "_=_",
                                     a[[names(x = at)]])
-      colnames(pred_se) <- paste0(a[[paste0(id_var)]],
+      colnames(pred_se) <- paste0(ids,
                                   "_at_",
                                   names(x = at),
                                   "_=_",
@@ -806,8 +823,22 @@ mipredictions <- function(df,
         regpred <- prediction::prediction(model = reg,
                                           at = at)
 
-        regmodel <- reg$model
-        regmodel$idvariable <- unique(regpred[[paste0(id_var)]])
+        regmodel <- data.frame(matrix(data = NA,
+                                      nrow = length(a$fitted),
+                                      ncol = length(variables)))
+        colnames(regmodel) <- variables
+        regmodel$idvariable <- df[df[[imp_var]] == imp, ][[paste0(id_var)]]
+        regmodel$pred <- regpred$fitted
+        regmodel$pred_se <- regpred$se.fitted
+        regmodel$at_level <- regpred[[names(at)]]
+
+        for (var in variables) {
+
+          regmodel[[paste0(var)]] <- regpred[[paste0(var)]]
+
+        }
+
+
 
         for (id in ids) {
           for (value in regpred[[names(at)]]) {
@@ -816,18 +847,18 @@ mipredictions <- function(df,
                               names(x = at),
                               "_=_",
                               value)]][pred_coef$imputation == imp] <-
-              regpred$fitted[(regpred[[paste0(id_var)]] == id &
-                                regpred[[names(at)]] == value)]
+              regmodel$pred[(regmodel$idvariable == id &
+                               regmodel$at_level == value)]
 
             pred_se[[paste0(id,
                             "_at_",
                             names(x = at),
                             "_=_",
                             value)]][pred_se$imputation == imp] <-
-              regpred$se.fitted[(regpred[[paste0(id_var)]] == id &
-                                   regpred[[names(at)]] == value)]
+              regmodel$pred_se[(regmodel$idvariable == id &
+                                  regmodel$at_level == value)]
 
-            for (col in colnames(reg$model)) {
+            for (col in variables) {
               d <- get(paste0(col))
 
               d[[paste0(id,
@@ -835,7 +866,7 @@ mipredictions <- function(df,
                         names(x = at),
                         "_=_",
                         value)]][get(paste0(col))[["imputation"]] == imp] <-
-                regmodel[[paste0(col)]][regmodel$idvariable == id]
+                regmodel[[paste0(col)]][(regmodel$idvariable == id & regmodel$at_level == value)]
 
               assign(x = paste0(col),
                      value = d)
@@ -875,28 +906,28 @@ mipredictions <- function(df,
           ncol = length(a$fitted)
         ))
 
-      colnames(mean_pred) <- paste0(a[[paste0(id_var)]],
+      colnames(mean_pred) <- paste0(ids,
                                     "_at_",
                                     names(x = at),
                                     "_=_",
                                     a[[names(x = at)]])
-      colnames(within_var) <- paste0(a[[paste0(id_var)]],
+      colnames(within_var) <- paste0(ids,
                                      "_at_",
                                      names(x = at),
                                      "_=_",
                                      a[[names(x = at)]])
-      colnames(between_var) <- paste0(a[[paste0(id_var)]],
+      colnames(between_var) <- paste0(ids,
                                       "_at_",
                                       names(x = at),
                                       "_=_",
                                       a[[names(x = at)]])
-      colnames(pooled_se) <- paste0(a[[paste0(id_var)]],
+      colnames(pooled_se) <- paste0(ids,
                                     "_at_",
                                     names(x = at),
                                     "_=_",
                                     a[[names(x = at)]])
 
-      for (col in colnames(test$model)) {
+      for (col in variables) {
         assign(x = paste0("mean_",
                           col),
                value = data.frame(matrix(
@@ -970,7 +1001,7 @@ mipredictions <- function(df,
                                                                                                    "_=_",
                                                                                                    value)]] / imps))
 
-          for (col in colnames(test$model)) {
+          for (col in variables) {
             d <- get(paste0("mean_",
                             col))
 
@@ -1001,16 +1032,16 @@ mipredictions <- function(df,
         pred_se = rep(x = NA,
                       times = length(a[[names(x = at)]]))
       )
-      pred[[paste0(id_var)]] <- a[[paste0(id_var)]]
+      pred[[paste0(id_var)]] <- ids
 
-      pred[["name"]] <- paste0(a[[paste0(id_var)]],
+      pred[["name"]] <- paste0(ids,
                                "_at_",
                                names(x = at),
                                "_=_",
                                a[[names(x = at)]])
       pred[["at_level"]] <- a[[names(x = at)]]
 
-      for (col in colnames(test$model)) {
+      for (col in variables) {
         pred[[paste0(col)]] <- NA
 
 
@@ -1039,7 +1070,7 @@ mipredictions <- function(df,
                               "_=_",
                               value)]]
 
-          for (col in colnames(test$model)) {
+          for (col in variables) {
             pred[[paste0(col)]][pred[["name"]] == paste0(id,
                                                          "_at_",
                                                          names(x = at),
