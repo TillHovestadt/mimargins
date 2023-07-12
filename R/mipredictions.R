@@ -17,7 +17,7 @@ mipredictions <- function(df,
                           type = "lm",
                           at = NULL,
                           linkfunction = NULL,
-                          variables) {
+                          variables = NULL) {
   # for linear OLS regression ----
   if (type == "lm") {
     if (is.null(at)) {
