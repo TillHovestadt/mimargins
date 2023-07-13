@@ -567,7 +567,8 @@ mipredictions <- function(df,
 
       a <- prediction::prediction(model = test,
                                   at = at,
-                                  calculate_se = T)
+                                  calculate_se = T,
+                                  type = "response")
 
       N <- length(a$fitted)
       imps <- length(unique(df[[imp_var]]))
@@ -612,7 +613,8 @@ mipredictions <- function(df,
 
         regpred <- prediction::prediction(model = reg,
                                           at = at,
-                                          calculate_se = T)
+                                          calculate_se = T,
+                                          type = "response")
 
         regmodel <- data.frame(matrix(data = NA,
                                       nrow = length(a$fitted),
@@ -772,7 +774,8 @@ mipredictions <- function(df,
 
       a <- prediction::prediction(model = test,
                                   at = at,
-                                  calculate_se = T)
+                                  calculate_se = T,
+                                  type = "response")
 
       N <- length(a$fitted)
       imps <- length(unique(df[[imp_var]]))
@@ -829,7 +832,8 @@ mipredictions <- function(df,
 
         regpred <- prediction::prediction(model = reg,
                                           at = at,
-                                          calculate_se = T)
+                                          calculate_se = T,
+                                          type = "response")
 
         regmodel <- data.frame(matrix(data = NA,
                                       nrow = length(a$fitted),
