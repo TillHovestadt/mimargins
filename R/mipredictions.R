@@ -8,6 +8,8 @@
 #' @param linkfunction If type is set to 'glm', a linkfunction needs to be specified. Has no effect if type is set to other values.
 #' @param type Specifies which type of regression to run. Currently supports 'lm' (Default), 'lmer' and 'glm'. Has to correspond to the specified formula.
 #' @param variables Specifies the variables of interest for which pooled estimates shall be computed. Only applies for type == "lmer". In all other cases, all variables in the regression model are taken as a default.
+#' @param bootSeed For type = "lmer" only. Indicated whether a specific seed for the bootstraping of SEs shall be drawn. Otherwise, random seeds are drawn.
+#' @param bootSims Number of Bootstrap Simulations to utilize. Defaults to 1000.
 #' @return Returns Dataframe of Predicted Values and SEs.
 #' @export
 mipredictions <- function(df,
@@ -17,12 +19,14 @@ mipredictions <- function(df,
                           type = "lm",
                           at = NULL,
                           linkfunction = NULL,
-                          variables = NULL) {
+                          variables = NULL,
+                          bootSeed = NULL,
+                          bootSims = 1000) {
   # for linear OLS regression ----
   if (type == "lm") {
     if (is.null(at)) {
       ifelse(!require(prediction),
-             install.packages(prediction, dep = T),
+             install.packages("prediction", dep = T),
              require(prediction))
       require(prediction)
 
@@ -214,7 +218,7 @@ mipredictions <- function(df,
 
 
       ifelse(!require(prediction),
-             install.packages(prediction, dep = T),
+             install.packages("prediction", dep = T),
              require(prediction))
       require(prediction)
 
@@ -549,14 +553,20 @@ mipredictions <- function(df,
   if (type == "lmer") {
 
     ifelse(!require(lme4),
-           install.packages(lme4, dep = T),
+           install.packages("lme4", dep = T),
            require(lme4))
     require(lme4)
+
+    ifelse(!require(merTools),
+           install.packages("merTools", dep = T),
+           require(merTools))
+    require(merTools)
+
 
 
     if (is.null(at)) {
       ifelse(!require(prediction),
-             install.packages(prediction, dep = T),
+             install.packages("prediction", dep = T),
              require(prediction))
       require(prediction)
 
@@ -573,6 +583,18 @@ mipredictions <- function(df,
       N <- length(a$fitted)
       imps <- length(unique(df[[imp_var]]))
       ids <- unique(df[[paste0(id_var)]])
+
+      ses <- predictInterval(merMod = test,
+                             newdata = df,
+                             seed = bootSeed,
+                             n.sims = bootSims,
+                             which = "full",
+                             stat = "mean",
+                             include.resid.var = T)
+
+      ses$se <- (ses$upr - ses$lwr) / (2*1.96)
+
+
 
       for (col in variables) {
         assign(x = paste0(col),
@@ -616,13 +638,24 @@ mipredictions <- function(df,
                                           calculate_se = T,
                                           type = "response")
 
+        ses <- predictInterval(merMod = reg,
+                               newdata = df,
+                               seed = bootSeed,
+                               n.sims = bootSims,
+                               which = "full",
+                               stat = "mean",
+                               include.resid.var = T,
+                               level = 0.95)
+
+        ses$se <- (ses$upr - ses$lwr) / (2*1.96)
+
         regmodel <- data.frame(matrix(data = NA,
                                       nrow = length(a$fitted),
                                       ncol = length(variables)))
         colnames(regmodel) <- variables
         regmodel$idvariable <- df[df[[imp_var]] == imp, ][[paste0(id_var)]]
-        regmodel$pred <- regpred$fitted
-        regmodel$pred_se <- regpred$se.fitted
+        regmodel$pred <- ses$fit
+        regmodel$pred_se <- ses$se
 
         for (var in variables) {
 
@@ -763,7 +796,7 @@ mipredictions <- function(df,
 
 
       ifelse(!require(prediction),
-             install.packages(prediction, dep = T),
+             install.packages("prediction", dep = T),
              require(prediction))
       require(prediction)
 
@@ -776,6 +809,15 @@ mipredictions <- function(df,
                                   at = at,
                                   calculate_se = T,
                                   type = "response")
+
+      ses <- predictInterval(merMod = test,
+                             newdata = df,
+                             seed = bootSeed,
+                             n.sims = bootSims,
+                             which = "full",
+                             stat = "mean",
+                             include.resid.var = T)
+
 
       N <- length(a$fitted)
       imps <- length(unique(df[[imp_var]]))
@@ -830,18 +872,82 @@ mipredictions <- function(df,
         reg <- lmer(formula = formula,
                     data = df[df[[imp_var]] == imp, ])
 
+        length_at <- length(at)
+        times_at <- 0
+
+        df_imp <- df[df[[imp_var]] == imp, ]
+
+        for (i in 1:length(at)) {
+
+          assign(x = paste0("length_",
+                            i),
+                 value = length(at[[i]]))
+
+          times_at <- times_at + get(paste0("length_",
+                                            i))
+
+          for (j in 1:get(paste0("length_",
+                                 i))) {
+
+            d <- df_imp
+            d[[names(at)[i]]] <- at[[i]][j]
+
+            assign(x = paste0("df_",
+                              i,
+                              "_",
+                              j),
+                   value = d)
+
+
+          }
+
+        }
+
+        df_se <- df_imp[0,]
+
+        for (i in 1:length(at)) {
+
+          for (j in 1:get(paste0("length_",
+                                 i))) {
+
+
+            df_se <- rbind(df_se,
+                           get(paste0("df_",
+                                      i,
+                                      "_",
+                                      j)))
+
+
+          }
+
+        }
+
+
+
+
         regpred <- prediction::prediction(model = reg,
                                           at = at,
                                           calculate_se = T,
                                           type = "response")
+
+        ses <- predictInterval(merMod = reg,
+                               newdata = df_se,
+                               seed = bootSeed,
+                               n.sims = bootSims,
+                               which = "full",
+                               stat = "mean",
+                               include.resid.var = T,
+                               level = 0.95)
+
+        ses$se <- (ses$upr - ses$lwr) / (2*1.96)
 
         regmodel <- data.frame(matrix(data = NA,
                                       nrow = length(a$fitted),
                                       ncol = length(variables)))
         colnames(regmodel) <- variables
         regmodel$idvariable <- df[df[[imp_var]] == imp, ][[paste0(id_var)]]
-        regmodel$pred <- regpred$fitted
-        regmodel$pred_se <- regpred$se.fitted
+        regmodel$pred <- ses$fit
+        regmodel$pred_se <- ses$se
         regmodel$at_level <- regpred[[names(at)]]
 
         for (var in variables) {
@@ -1121,10 +1227,10 @@ mipredictions <- function(df,
 
 
     if (is.null(at)) {
-      ifelse(!require(prediction),
-             install.packages(prediction, dep = T),
-             require(prediction))
-      require(prediction)
+      ifelse(!require("prediction"),
+             install.packages("prediction", dep = T),
+             require("prediction"))
+      require("prediction")
 
       test  <- glm(formula = formula,
                    data = df[df[[imp_var]] == 1, ],
@@ -1316,7 +1422,7 @@ mipredictions <- function(df,
 
 
       ifelse(!require(prediction),
-             install.packages(prediction, dep = T),
+             install.packages("prediction", dep = T),
              require(prediction))
       require(prediction)
 

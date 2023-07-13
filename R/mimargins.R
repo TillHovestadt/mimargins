@@ -24,7 +24,7 @@ mimargins <- function(df,
     if (ame == T) {
       if (is.null(at)) {
         ifelse(!require(margins),
-               install.packages(margins, dep = T),
+               install.packages("margins", dep = T),
                require(margins))
         require(margins)
 
@@ -130,7 +130,7 @@ mimargins <- function(df,
 
       } else {
         ifelse(!require(margins),
-               install.packages(margins, dep = T),
+               install.packages("margins", dep = T),
                require(margins))
         require(margins)
 
@@ -412,7 +412,7 @@ mimargins <- function(df,
 
   if (type == "lmer") {
     ifelse(!require(lme4),
-           install.packages(lme4, dep = T),
+           install.packages("lme4", dep = T),
            require(lme4))
     require(lme4)
 
@@ -420,7 +420,7 @@ mimargins <- function(df,
     if (ame == T) {
       if (is.null(at)) {
         ifelse(!require(margins),
-               install.packages(margins, dep = T),
+               install.packages("margins", dep = T),
                require(margins))
         require(margins)
 
@@ -526,7 +526,7 @@ mimargins <- function(df,
 
       } else {
         ifelse(!require(margins),
-               install.packages(margins, dep = T),
+               install.packages("margins", dep = T),
                require(margins))
         require(margins)
 
@@ -814,7 +814,7 @@ mimargins <- function(df,
     if (ame == T) {
       if (is.null(at)) {
         ifelse(!require(margins),
-               install.packages(margins, dep = T),
+               install.packages("margins", dep = T),
                require(margins))
         require(margins)
 
@@ -922,7 +922,7 @@ mimargins <- function(df,
 
       } else {
         ifelse(!require(margins),
-               install.packages(margins, dep = T),
+               install.packages("margins", dep = T),
                require(margins))
         require(margins)
 
