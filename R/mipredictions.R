@@ -639,7 +639,7 @@ mipredictions <- function(df,
                                           type = "response")
 
         ses <- predictInterval(merMod = reg,
-                               newdata = df,
+                               newdata = df[df[[imp_var]] == imp, ],
                                seed = bootSeed,
                                n.sims = bootSims,
                                which = "full",
