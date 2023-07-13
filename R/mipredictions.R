@@ -30,7 +30,8 @@ mipredictions <- function(df,
                   data = df[df[[imp_var]] == 1, ])
 
       a <- prediction::prediction(model = test,
-                                  at = at)
+                                  at = at,
+                                  calculate_se = T)
 
       N <- length(a$fitted)
       imps <- length(unique(df[[imp_var]]))
@@ -74,7 +75,8 @@ mipredictions <- function(df,
                   data = df[df[[imp_var]] == imp, ])
 
         regpred <- prediction::prediction(model = reg,
-                                          at = at)
+                                          at = at,
+                                          calculate_se = T)
 
         regmodel <- reg$model
         regmodel$idvariable <- regpred[[paste0(id_var)]]
@@ -220,7 +222,8 @@ mipredictions <- function(df,
                   data = df[df[[imp_var]] == 1, ])
 
       a <- prediction::prediction(model = test,
-                                  at = at)
+                                  at = at,
+                                  calculate_se = T)
 
       N <- length(a$fitted)
       imps <- length(unique(df[[imp_var]]))
@@ -276,7 +279,8 @@ mipredictions <- function(df,
                   data = df[df[[imp_var]] == imp, ])
 
         regpred <- prediction::prediction(model = reg,
-                                          at = at)
+                                          at = at,
+                                          calculate_se = T)
 
         regmodel <- reg$model
         regmodel$idvariable <- unique(regpred[[paste0(id_var)]])
@@ -562,7 +566,8 @@ mipredictions <- function(df,
       b <- summary(test)
 
       a <- prediction::prediction(model = test,
-                                  at = at)
+                                  at = at,
+                                  calculate_se = T)
 
       N <- length(a$fitted)
       imps <- length(unique(df[[imp_var]]))
@@ -606,7 +611,8 @@ mipredictions <- function(df,
                     data = df[df[[imp_var]] == imp, ])
 
         regpred <- prediction::prediction(model = reg,
-                                          at = at)
+                                          at = at,
+                                          calculate_se = T)
 
         regmodel <- data.frame(matrix(data = NA,
                                       nrow = length(a$fitted),
@@ -765,7 +771,8 @@ mipredictions <- function(df,
       b <- summary(test)
 
       a <- prediction::prediction(model = test,
-                                  at = at)
+                                  at = at,
+                                  calculate_se = T)
 
       N <- length(a$fitted)
       imps <- length(unique(df[[imp_var]]))
@@ -821,7 +828,8 @@ mipredictions <- function(df,
                     data = df[df[[imp_var]] == imp, ])
 
         regpred <- prediction::prediction(model = reg,
-                                          at = at)
+                                          at = at,
+                                          calculate_se = T)
 
         regmodel <- data.frame(matrix(data = NA,
                                       nrow = length(a$fitted),
@@ -1119,7 +1127,8 @@ mipredictions <- function(df,
                    family = linkfunction)
 
       a <- prediction::prediction(model = test,
-                                  at = at)
+                                  at = at,
+                                  calculate_se = T)
 
       N <- length(a$fitted)
       imps <- length(unique(df[[imp_var]]))
@@ -1164,7 +1173,8 @@ mipredictions <- function(df,
                    family = linkfunction)
 
         regpred <- prediction::prediction(model = reg,
-                                          at = at)
+                                          at = at,
+                                          calculate_se = T)
 
         regmodel <- reg$model
         regmodel$idvariable <- regpred[[paste0(id_var)]]
@@ -1311,7 +1321,8 @@ mipredictions <- function(df,
                    family = linkfunction)
 
       a <- prediction::prediction(model = test,
-                                  at = at)
+                                  at = at,
+                                  calculate_se = T)
 
       N <- length(a$fitted)
       imps <- length(unique(df[[imp_var]]))
@@ -1368,7 +1379,8 @@ mipredictions <- function(df,
                    family = linkfunction)
 
         regpred <- prediction::prediction(model = reg,
-                                          at = at)
+                                          at = at,
+                                          calculate_se = T)
 
         regmodel <- reg$model
         regmodel$idvariable <- unique(regpred[[paste0(id_var)]])
