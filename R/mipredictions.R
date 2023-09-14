@@ -1227,10 +1227,10 @@ mipredictions <- function(df,
 
 
     if (is.null(at)) {
-      ifelse(!require("prediction"),
+      ifelse(!require(prediction),
              install.packages("prediction", dep = T),
-             require("prediction"))
-      require("prediction")
+             require(prediction))
+      require(prediction)
 
       test  <- glm(formula = formula,
                    data = df[df[[imp_var]] == 1, ],
