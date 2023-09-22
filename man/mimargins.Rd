@@ -12,7 +12,9 @@ mimargins(
   ame = T,
   variables = NULL,
   at = NULL,
-  linkfunction = NULL
+  linkfunction = NULL,
+  se_type = NULL,
+  clustervar = NULL
 )
 }
 \arguments{
@@ -22,7 +24,7 @@ mimargins(
 
 \item{imp_var}{The variable in the data frame indicating the imputation (m). Defaults to ".imp".}
 
-\item{type}{Specifies which type of regression to run. Currently supports 'lm' (Default), 'lmer' and 'glm'. Has to correspond to the specified formula.}
+\item{type}{Specifies which type of regression to run. Currently supports 'lm' (Default), 'lm_robust', 'lmer' and 'glm'. Has to correspond to the specified formula.}
 
 \item{ame}{Whether average marginal effects (AMEs) shall be calculated. Defaults to TRUE. If set to FALSE, a regression with the formula above is run for each imputation and pooled using Rubin's Rules. If set to true, AMEs are calculated for each imputation and then pooled using Rubin's rules.}
 
@@ -31,6 +33,10 @@ mimargins(
 \item{at}{Whether AMEs shall be calculated at specified levels of another variable. Currently only works for specifying one variable. The number of levels may vary. Input has to take the form list(VARIABLENAME = c(level1, level2, level3 ...)). Only has an effect if ame = T. Defaults to NULL. Then, AMEs are averaged over all levels of all other variables.}
 
 \item{linkfunction}{If type is set to 'glm', a linkfunction needs to be specified. Has no effect if type is set to other values.}
+
+\item{se_type}{Only applies to type = 'lm_robust'. Specifies the sort of (robust) SE sought. Allows "HC0", "HC1" (or "stata", the equivalent), "HC2", "HC3", or "classical". If clusters is specified the options are "CR0", "CR2", or "stata". See ?estimatr::lm_robust for more information.}
+
+\item{clustervar}{Only applies to type = 'lm_robust'. Variable (in quotation marks) to apply for calculating clustered standard errors. See ?estimatr::lm_robust for more information.}
 }
 \value{
 Returns Dataframe of AMEs and SEs.

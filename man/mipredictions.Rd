@@ -11,7 +11,10 @@ mipredictions(
   id_var,
   type = "lm",
   at = NULL,
-  linkfunction = NULL
+  linkfunction = NULL,
+  variables = NULL,
+  bootSeed = NULL,
+  bootSims = 1000
 )
 }
 \arguments{
@@ -28,6 +31,12 @@ mipredictions(
 \item{at}{Whether Predicted Values shall be calculated at specified levels of another variable. Currently only works for specifying one variable. The number of levels may vary. Input has to take the form list(VARIABLENAME = c(level1, level2, level3 ...)). Defaults to NULL. Then, Predicted Values are averaged over all levels of all other variables.}
 
 \item{linkfunction}{If type is set to 'glm', a linkfunction needs to be specified. Has no effect if type is set to other values.}
+
+\item{variables}{Specifies the variables of interest for which pooled estimates shall be computed. Only applies for type == "lmer". In all other cases, all variables in the regression model are taken as a default.}
+
+\item{bootSeed}{For type = "lmer" only. Indicated whether a specific seed for the bootstraping of SEs shall be drawn. Otherwise, random seeds are drawn.}
+
+\item{bootSims}{Number of Bootstrap Simulations to utilize. Defaults to 1000.}
 }
 \value{
 Returns Dataframe of Predicted Values and SEs.
